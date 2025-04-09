@@ -6,9 +6,10 @@ class Caballo:
         self.tablero = tablero if tablero else self.crearTableroVacio()
         self.posicion = posicion if posicion else self.generarCaballo()
         self.movimientos_posibles = []
-        self.contador_movimientos = 0
+        self.contador_movimientos = 1
         self.casillas_visitadas = set()
         self.casillas_visitadas.add(self.posicion)
+        self.tablero[self.posicion[0]][self.posicion[1]] = self.contador_movimientos
 
     def __str__(self):
         return f"Caballo en la posición: {self.posicion}, Movimientos realizados: {self.contador_movimientos}, Casillas visitadas: {len(self.casillas_visitadas)}"
@@ -39,5 +40,49 @@ class Caballo:
             self.posicion = nueva_posicion
             self.contador_movimientos += 1
             self.casillas_visitadas.add(nueva_posicion)
+            self.tablero[self.posicion[0]][self.posicion[1]] = self.contador_movimientos
         else:
             raise ValueError("Movimiento no válido")
+
+    def resolverRecorrido(self):
+        # Reiniciamos el tablero y comenzamos desde la posición inicial
+        self.tablero = self.crearTableroVacio()
+        x, y = self.posicion
+        self.tablero[x][y] = 1
+        if self._resolverRecorridoBacktracking(x, y, 1):
+            return True
+        else:
+            print("No se encontró una solución")
+            return False
+
+    def _resolverRecorridoBacktracking(self, x, y, movimiento_actual):
+        if movimiento_actual == 64:
+            return True
+
+        movimientos = [
+            (2, 1), (1, 2), (-1, 2), (-2, 1),
+            (-2, -1), (-1, -2), (1, -2), (2, -1)
+        ]
+        
+        # Ordenar los movimientos por Warnsdorff (opcional para mejorar rendimiento)
+        posibles = []
+        for dx, dy in movimientos:
+            nx, ny = x + dx, y + dy
+            if 0 <= nx < 8 and 0 <= ny < 8 and self.tablero[nx][ny] == 0:
+                # Cuenta los siguientes movimientos posibles (heurística de Warnsdorff)
+                count = 0
+                for ddx, ddy in movimientos:
+                    nnx, nny = nx + ddx, ny + ddy
+                    if 0 <= nnx < 8 and 0 <= nny < 8 and self.tablero[nnx][nny] == 0:
+                        count += 1
+                posibles.append(((nx, ny), count))
+        
+        posibles.sort(key=lambda x: x[1])  # Warnsdorff
+
+        for (nx, ny), _ in posibles:
+            self.tablero[nx][ny] = movimiento_actual + 1
+            if self._resolverRecorridoBacktracking(nx, ny, movimiento_actual + 1):
+                return True
+            self.tablero[nx][ny] = 0  # backtrack
+
+        return False

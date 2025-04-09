@@ -1,23 +1,27 @@
 from caballos import Caballo
 
-# filepath: /Users/alvarocosta/Documents/programacion/TresJuegos/main.py
+def imprimir_tablero(tablero):
+    print("\nTablero final:\n")
+    for fila in tablero:
+        print(" ".join(f"{celda:2}" for celda in fila))
 
 def main():
     # Crear una instancia de la clase Caballo
     caballo = Caballo()
     
     # Mostrar la posición inicial del caballo
+    print("Posición inicial del caballo:")
     print(caballo)
     
-    # Calcular movimientos posibles
-    movimientos = caballo.calcularMovimientosPosibles()
-    print("Movimientos posibles:", movimientos)
+    # Intentar resolver el recorrido completo del caballo
+    print("\nResolviendo el recorrido del caballo...")
+    if caballo.resolverRecorrido():
+        print("\n¡Recorrido completado con éxito!")
+    else:
+        print("\nNo se pudo completar el recorrido.")
     
-    # Mover el caballo si hay movimientos posibles
-    if movimientos:
-        caballo.moverCaballo(movimientos[0])  # Mover al primer movimiento posible
-        print("Después de mover:")
-        print(caballo)
+    imprimir_tablero(caballo.tablero)
+
 
 if __name__ == "__main__":
     main()
