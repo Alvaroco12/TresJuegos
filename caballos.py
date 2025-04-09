@@ -28,10 +28,22 @@ class Caballo:
             (-2, -1), (-1, -2), (1, -2), (2, -1)
         ]
         x, y = self.posicion
-        self.movimientos_posibles = [
-            (x + dx, y + dy) for dx, dy in movimientos
-            if 0 <= x + dx < 8 and 0 <= y + dy < 8 and (x + dx, y + dy) not in self.casillas_visitadas
-        ]
+        posibles = []
+
+        for dx, dy in movimientos:
+            nx, ny = x + dx, y + dy
+            if 0 <= nx < 8 and 0 <= ny < 8 and (nx, ny) not in self.casillas_visitadas:
+                # Cuenta los movimientos futuros posibles desde esta casilla
+                count = 0
+                for ddx, ddy in movimientos:
+                    nnx, nny = nx + ddx, ny + ddy
+                    if 0 <= nnx < 8 and 0 <= nny < 8 and (nnx, nny) not in self.casillas_visitadas:
+                        count += 1
+                posibles.append(((nx, ny), count))
+
+        # Ordenar los movimientos por la cantidad de opciones futuras (Warnsdorff)
+        posibles.sort(key=lambda x: x[1])
+        self.movimientos_posibles = [pos[0] for pos in posibles]
         return self.movimientos_posibles
 
     def moverCaballo(self, nueva_posicion):
@@ -59,27 +71,8 @@ class Caballo:
         if movimiento_actual == 64:
             return True
 
-        movimientos = [
-            (2, 1), (1, 2), (-1, 2), (-2, 1),
-            (-2, -1), (-1, -2), (1, -2), (2, -1)
-        ]
-        
-        # Ordenar los movimientos por Warnsdorff (opcional para mejorar rendimiento)
-        posibles = []
-        for dx, dy in movimientos:
-            nx, ny = x + dx, y + dy
-            if 0 <= nx < 8 and 0 <= ny < 8 and self.tablero[nx][ny] == 0:
-                # Cuenta los siguientes movimientos posibles (heurística de Warnsdorff)
-                count = 0
-                for ddx, ddy in movimientos:
-                    nnx, nny = nx + ddx, ny + ddy
-                    if 0 <= nnx < 8 and 0 <= nny < 8 and self.tablero[nnx][nny] == 0:
-                        count += 1
-                posibles.append(((nx, ny), count))
-        
-        posibles.sort(key=lambda x: x[1])  # Warnsdorff
-
-        for (nx, ny), _ in posibles:
+        movimientos = self.calcularMovimientosPosibles()
+        for nx, ny in movimientos:
             self.tablero[nx][ny] = movimiento_actual + 1
             if self._resolverRecorridoBacktracking(nx, ny, movimiento_actual + 1):
                 return True
