@@ -59,17 +59,15 @@ class Aplicacion:
                 if evento.type == pygame.QUIT:
                     self.ejecutando = False
 
-            # Realizar un paso en el recorrido
-            movimientos_posibles = self.caballo.calcularMovimientosPosibles()
-            if movimientos_posibles:
-                nueva_posicion = movimientos_posibles[0]
+            # Obtener el siguiente movimiento en la ruta precalculada
+            nueva_posicion = self.caballo.obtenerSiguienteMovimiento()
+            if nueva_posicion:
                 self.caballo.moverCaballo(nueva_posicion)
                 self.posiciones_visitadas.append(nueva_posicion)
                 self.dibujar_tablero()
             else:
-                print("No se puede mover más. Reiniciando...")
-                self.caballo = Caballo()  # Reiniciar el caballo
-                self.posiciones_visitadas = [self.caballo.posicion]
+                print("Recorrido completo.")
+                self.ejecutando = False
 
             pygame.display.flip()  # Actualizar la pantalla
             self.reloj.tick(10)  # Aumentar la velocidad (10 FPS)
