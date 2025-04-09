@@ -67,19 +67,14 @@ class Aplicacion:
                 self.posiciones_visitadas.append(nueva_posicion)
                 self.dibujar_tablero()
             else:
-                print("No se puede mover más.")
-                self.ejecutando = False
+                print("No se puede mover más. Reiniciando...")
+                self.caballo = Caballo()  # Reiniciar el caballo
+                self.posiciones_visitadas = [self.caballo.posicion]
 
             pygame.display.flip()  # Actualizar la pantalla
-            self.reloj.tick(2)  # Controlar la velocidad (2 FPS)
+            self.reloj.tick(10)  # Aumentar la velocidad (10 FPS)
 
-        # Mantener la ventana abierta después de terminar
-        print("Recorrido terminado. Cierra la ventana para salir.")
-        while True:
-            for evento in pygame.event.get():
-                if evento.type == pygame.QUIT:
-                    pygame.quit()
-                    return
+        pygame.quit()
 
 def main():
     app = Aplicacion()
