@@ -70,7 +70,7 @@ class Aplicacion:
                 self.ejecutando = False
 
             pygame.display.flip()  # Actualizar la pantalla
-            self.reloj.tick(10)  # Aumentar la velocidad (10 FPS)
+            self.reloj.tick(2)  # Aumentar la velocidad (10 FPS)
 
         pygame.quit()
 
